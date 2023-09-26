@@ -11,31 +11,30 @@ Citizen.CreateThread(function()
         Cb(Config.VehicleParts)
     end)
 
-    function CalculateItemQuality(CreateDate, Slot, VehNetId)
-        -- Calculate the age of the item in days (you may need to adjust this based on your game's time system)
-        local ageInDays = (os.time() - CreateDate) / (60 * 60 * 24)
-    
-        -- Define decay factors based on your rules (these are just examples)
-        local decayPerDay = 1  -- Adjust this based on how fast you want items to decay
-        local decayPerUse = 0.5  -- Adjust this based on item usage impact
-    
-        -- Calculate quality based on decay rules
-        local quality = 100 - (ageInDays * decayPerDay) - (Slot * decayPerUse)
-    
-        -- Ensure quality doesn't go below 0
-        quality = math.max(quality, 0)
-    
-        return quality
-    end
-        
     CallbackModule.CreateCallback('mercy-business/server/hayes/get-new-percentage', function(Source, Cb, Misc, CreateDate, Slot, VehNetId)
-        -- Calculate Item Quality
-        local NewPercentage = CalculateItemQuality(CreateDate, Slot, VehNetId)
-        -- Set the item quality as vehicle metadata
-        TriggerEvent('mercy-vehicles/server/set-veh-meta', VehNetId, Misc, NewPercentage)
-        -- Return the calculated quality as the callback result
-        Cb(NewPercentage)
+        local ItemQuality = 100 -- Initialize item quality at 100%
+                
+        -- Calculate the number of days since the item's creation date
+        local currentDate = os.date('*t')
+        local itemDate = os.date('*t', CreateDate)
+        local daysSinceCreation = os.difftime(os.time(currentDate), os.time(itemDate)) / (60 * 60 * 24) -- Calculate days
+        
+        -- Define the decay rate (how much quality decreases per day)
+        local decayRate = 0.5 -- Adjust this value as needed
+        
+        -- Apply decay based on the number of days since creation
+        ItemQuality = ItemQuality - (decayRate * daysSinceCreation)
+                
+        -- Ensure the item quality doesn't go below 0
+        if ItemQuality < 0 then
+            ItemQuality = 0
+        end
+                
+        -- Update the item's quality in the database or wherever it's stored
+        TriggerEvent('mercy-vehicles/server/set-veh-meta', VehNetId, Misc, ItemQuality)
+        Cb(ItemQuality)
     end)
+
 
     EventsModule.RegisterServer('mercy-business/server/hayes/repair-part', function(Source, Plate, Part) 
         Config.VehicleParts[Plate][Part] = 100
