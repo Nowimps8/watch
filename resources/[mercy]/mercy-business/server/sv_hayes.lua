@@ -11,10 +11,29 @@ Citizen.CreateThread(function()
         Cb(Config.VehicleParts)
     end)
 
+    function CalculateItemQuality(CreateDate, Slot, VehNetId)
+        -- Calculate the age of the item in days (you may need to adjust this based on your game's time system)
+        local ageInDays = (os.time() - CreateDate) / (60 * 60 * 24)
+    
+        -- Define decay factors based on your rules (these are just examples)
+        local decayPerDay = 1  -- Adjust this based on how fast you want items to decay
+        local decayPerUse = 0.5  -- Adjust this based on item usage impact
+    
+        -- Calculate quality based on decay rules
+        local quality = 100 - (ageInDays * decayPerDay) - (Slot * decayPerUse)
+    
+        -- Ensure quality doesn't go below 0
+        quality = math.max(quality, 0)
+    
+        return quality
+    end
+        
     CallbackModule.CreateCallback('mercy-business/server/hayes/get-new-percentage', function(Source, Cb, Misc, CreateDate, Slot, VehNetId)
-        -- TODO: Calculate Item Quality from CreateDate / how much item has decayed and return as percentage
-        local NewPercentage = 100
+        -- Calculate Item Quality
+        local NewPercentage = CalculateItemQuality(CreateDate, Slot, VehNetId)
+        -- Set the item quality as vehicle metadata
         TriggerEvent('mercy-vehicles/server/set-veh-meta', VehNetId, Misc, NewPercentage)
+        -- Return the calculated quality as the callback result
         Cb(NewPercentage)
     end)
 
