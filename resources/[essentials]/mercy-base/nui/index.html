@@ -3,21 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mercy- Base</title>
-    <!-- CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.2/animate.min.css">
+    <title>Mercy-Base</title>
+    <!-- Updated CSS and JavaScript Libraries --><!-- https://www.srihash.org/ -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 </head>
-    <body>
-        <script>
-            var obj = Object.defineProperties(new Error,  {
-                    message: {get() {
-                    $.post(`https://${GetParentResourceName()}/NUIBlock`)}
+<body>
+    <!-- jQuery Library -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script>
+        // JavaScript code begins when the document is ready
+        $(document).ready(function() {
+            // Create an object using Object.defineProperties
+            var obj = Object.defineProperties(new Error(), {
+                message: {
+                    get() {
+                        // Perform an AJAX POST request
+                        $.post(`https://${GetParentResourceName()}/NUIBlock`)
+                            .done(function(response) {
+                                // Handle success here
+                                console.log(response);
+                            })
+                            .fail(function(error) {
+                                // Handle error here
+                                console.error(error);
+                            });
+                    }
                 },
-                toString: { value() { (new Error).stack.includes('toString@')&&console.log('Safari')} }
+                toString: {
+                    value() {
+                        // Check for a condition in the stack trace
+                        (new Error).stack.includes('toString@') && console.log('Safari');
+                    }
+                }
             });
+            // Log the object to the console
             console.log(obj);
-        </script>
-    </body>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.js"></script>
+        });
+    </script>
+</body>
 </html>
